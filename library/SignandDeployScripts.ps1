@@ -119,7 +119,7 @@ function Deploy-Script([string]$SourceFilePath, [string]$TargetFolderPath)
         if (!(Test-Path $targetFilePath) -or (Compare-Object ($file) (Get-Item $targetFilePath) -Property Name, Length, LastWriteTime -passThru | Where-Object { $_.SideIndicator -ne '==' }).count -eq 2 )
         {
    	    	Write-Host "deploying script $($file.Fullname) to $TargetPath"
-            copy -LiteralPath $SourceFile -Destination $targetFilePath -Force
+            copy -LiteralPath $SourceFilePath -Destination $targetFilePath -Force
         }
     }
 }
@@ -150,7 +150,7 @@ function Deploy-Scripts([string]$WorkingFolder, [string]$TargetFolder)
         if ($fileSignature.Status -eq "Valid" -and $fileSignature.SignerCertificate.Thumbprint -eq $certThumbprint)
         {
             #Copy all files over, it might be better to only copy files that were signed
-			$targetFolderPath = $_.Parent.Fullname.replace($WorkingFolder, $TargetPath)
+			$targetFolderPath = $_.Parent.Fullname.replace($WorkingFolder, $TargetFolder)
 			Deploy-Script $_.FullName $targetFolderPath
         }
     }
@@ -202,9 +202,7 @@ function SignandDeploy-Scripts([string]$WorkingFolder, [string]$TargetFolder)
         if ($fileSignature.Status -eq "Valid" -and $fileSignature.SignerCertificate.Thumbprint -eq $certThumbprint)
         {
             #Copy all files over
-			
-			$targetFolderPath = $SourceFile.Parent.Fullname.replace($WorkingFolder, $TargetPath)
-			
+			$targetFolderPath = $_.Parent.Fullname.replace($WorkingFolder, $TargetFolder)
             Deploy-Script $_.FullName $targetFolderPath
         }
         else
